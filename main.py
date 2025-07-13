@@ -1,58 +1,87 @@
-from vectorstore import ChromaVectorStore
+from vectordb import ChromaVectorStore
 from mistralai import Mistral
 from dotenv import load_dotenv
 import os
+import streamlit as st
+import tempfile
+from workflow import Workflow
+from state import RAGState
 
 load_dotenv()
 
-llm_client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
-store = ChromaVectorStore("WorldWar2.pdf", llm_client)
 
-def get_prompts(query: str, context: str) -> tuple[str, str]:
-    system_prompt = f"""You are an expert document summarizer.
-    
-                You will be given a user query and a set of retrieved document chunks that are relevant to that query. 
-                Use only the information in the provided chunks to generate a focused, coherent, and concise summary that 
-                directly answers or addresses the query.
-                
-                Avoid adding information not present in the context. Do not speculate.
-                If there is no data relating to the query mention that.
-    """
-    user_prompt = f"""
-                ## User Query:
-                {query}
-                
-                ## Retrieved Chunks:
-                {context}
-                
-                ## Your Task:
-                Write a focused and accurate summary based only on the retrieved chunks that addresses the user’s query.
-    """
+def show_upload_view():
+    st.header("📄 AI Document Summarizer")
+    uploaded_file = st.file_uploader("Upload PDF Document", type="pdf")
 
-    return system_prompt, user_prompt
+    if uploaded_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_file.read())
+            tmp_path = tmp.name
+
+        st.session_state.pdf_path = tmp_path
+        st.session_state.rag_workflow = Workflow(tmp_path) #initiliaze the langgraph workflow
+        st.session_state.app_stage = "summarize" #move to next view
+        st.rerun()  # trigger rerun to switch views
+
+def show_summarize_view():
+    st.title("📝 Ask about your document")
+
+    # 🔄 Rebuild store if needed
+    if "rag_workflow" not in st.session_state:
+        st.error("No document loaded. Please go back and upload one.")
+        return
 
 
-def main():
-    while True:
-        print("\n---------------------------------------------------\n(Type q to quit)")
-        topic = input("Enter a topic or a question relating to the document: ")
+    with st.sidebar:
+        st.markdown("## Navigation")
+        if st.button("🔙 Upload a Different PDF"):
+            st.session_state.clear()
+            st.session_state.app_stage = "upload"
+            st.rerun()
 
-        if topic == "q":
-            print("Goodbye.")
-            break
+        st.markdown("## Chat")
+        if st.button("🗑️ Clear Chat History"):
+            st.session_state.chat_state = RAGState()
+            st.rerun()
 
-        results = store.query(topic)
-        context = "\n\n".join(results["documents"][0])
+    query = st.chat_input("Ask something about your document...")
 
-        system_prompt, user_prompt = get_prompts(topic, context)
-        response = llm_client.chat.complete(model="mistral-small-latest",
-                                   messages=[
-                                       {"role": "system", "content": system_prompt},
-                                       {"role": "user", "content": user_prompt}
-                                   ])
+    # Initialize chat state if it doesn't exist
+    if "chat_state" not in st.session_state:
+        st.session_state.chat_state = RAGState()
 
-        print(response.choices[0].message.content)
+    # Display chat history
+    for message in st.session_state.chat_state.messages:
+        if message.type == "human":
+            with st.chat_message("user"):
+                st.markdown(message.content)
+        elif message.type == "ai":
+            with st.chat_message("assistant"):
+                st.markdown(message.content)
+
+    if query:
+        wflow = st.session_state.rag_workflow
+        state = RAGState(user_query=query, messages=getattr(st.session_state.get("chat_state", RAGState()), "messages", []))
+
+        with st.chat_message("user"):
+            st.markdown(query)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                final_state = wflow.run_workflow(state)
+                reply = final_state.response
+                st.markdown(reply)
+
+        # Store full updated chat state
+        st.session_state.chat_state = final_state
 
 
 if __name__ == "__main__":
-    main()
+    if "app_stage" not in st.session_state:
+        st.session_state.app_stage = "upload"
+    if st.session_state.app_stage == "upload":
+        show_upload_view()
+    elif st.session_state.app_stage == "summarize":
+        show_summarize_view()
+
