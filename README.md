@@ -6,7 +6,7 @@ This project is an **AI document summarizer and topic-based query system** that 
 
 ## 🚀 Live Demo
 
-Coming soon (deployed on Streamlit Cloud or Hugging Face Spaces)
+[Demo](https://rag-pdf-summarizer-agent.onrender.com)
 
 ---
 
