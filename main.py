@@ -34,7 +34,6 @@ def show_upload_view():
             text-align: center;
             font-size: 0.9rem;
             padding: 10px;
-            background-color: #f9f9f9;
         }
         </style>
         <div class="footer">
@@ -107,7 +106,6 @@ def show_summarize_view():
             text-align: center;
             font-size: 0.9rem;
             padding: 10px;
-            background-color: #f9f9f9;
         }
         </style>
         <div class="footer">
