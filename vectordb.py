@@ -13,7 +13,7 @@ class ChromaVectorStore:
         self.embed_client = client
         self.model = "mistral-embed"
 
-        self.client = chromadb.EphemeralClient()
+        self.client = chromadb.EphemeralClient(settings=chromadb.Settings(chroma_db_impl="duckdb+parquet"))
 
         if "pdf_chunks" in [c.name for c in self.client.list_collections()]:
             self.client.delete_collection("pdf_chunks")
