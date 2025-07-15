@@ -2,7 +2,6 @@ import chromadb
 import pymupdf
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from mistralai import Mistral
-import tempfile
 
 class ChromaVectorStore:
     """A wrapper around chroma to store PDFs in the vector database with chunking
@@ -14,12 +13,7 @@ class ChromaVectorStore:
         self.embed_client = client
         self.model = "mistral-embed"
 
-        temp_dir = tempfile.mkdtemp()
-
-        self.client = chromadb.Client(chromadb.Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=temp_dir
-        ))
+        self.client = chromadb.EphemeralClient()
 
         if "pdf_chunks" in [c.name for c in self.client.list_collections()]:
             self.client.delete_collection("pdf_chunks")
