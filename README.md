@@ -38,11 +38,8 @@ Coming soon (deployed on Streamlit Cloud or Hugging Face Spaces)
 
 ## 🧭 LangGraph Workflow Diagram
 
-```python
-[generate_query] --> [retrieve_context] --> [generate_summary] --> [END]
-```
-
-> Full graph visualization: *(screenshot or graphviz file placeholder)*
+> Full graph visualization:
+<img src="assets/langgraph_workflow.png" alt="LangGraph Workflow" width="600"/>
 
 ---
 
