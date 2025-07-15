@@ -9,9 +9,9 @@ from state import RAGState
 
 load_dotenv()
 
-
+# first page in the ui allowing for upload
 def show_upload_view():
-    st.header("📄 AI Document Summarizer")
+    st.header("AI Document Summarizer")
     uploaded_file = st.file_uploader("Upload PDF Document", type="pdf")
 
     if uploaded_file:
@@ -24,15 +24,16 @@ def show_upload_view():
         st.session_state.app_stage = "summarize" #move to next view
         st.rerun()  # trigger rerun to switch views
 
+#actual chat page of the ui
 def show_summarize_view():
     st.title("📝 Ask about your document")
 
-    # 🔄 Rebuild store if needed
+    # Rebuild store if needed
     if "rag_workflow" not in st.session_state:
         st.error("No document loaded. Please go back and upload one.")
         return
 
-
+    # left sidebar
     with st.sidebar:
         st.markdown("## Navigation")
         if st.button("🔙 Upload a Different PDF"):
@@ -60,6 +61,7 @@ def show_summarize_view():
             with st.chat_message("assistant"):
                 st.markdown(message.content)
 
+    # get agent response if user enters a chat message
     if query:
         wflow = st.session_state.rag_workflow
         state = RAGState(user_query=query, messages=getattr(st.session_state.get("chat_state", RAGState()), "messages", []))

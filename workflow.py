@@ -11,14 +11,20 @@ load_dotenv()
 
 
 class Workflow:
+    """
+    Langgraph RAG based workflow
+    Takes PDF, builds vector store, reformulates user queries, retrieves relevant context from PDF and answers
+    user queries using Mistral
+    """
+
     def __init__(self, pdf_path: str):
         self.llm = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self.vectorstore = ChromaVectorStore(pdf_path, self.llm)
         self.prompts = Prompts()
         self.workflow = self._build_workflow()
-        self.thread_config = {"configurable": {"thread_id": "1"}}
 
     def _to_mistral_format(self, messages: list) -> list[dict]:
+        """Convert langgraph message format to mistral format"""
         role_map = {
             "human": "user",
             "ai": "assistant",
@@ -27,6 +33,7 @@ class Workflow:
         return [{"role": role_map.get(m.type, "user"), "content": m.content} for m in messages]
 
     def _build_workflow(self):
+        #create graph
         graph = StateGraph(RAGState)
 
         graph.add_node("generate_query", self._generate_retrieval_query_step)
@@ -41,6 +48,7 @@ class Workflow:
         return graph.compile()
 
     def _generate_retrieval_query_step(self, state: RAGState) -> dict:
+        """get a more refined query with the users query using llm"""
         messages = [
             SystemMessage(content=self.prompts.SYSTEM_RETRIEVAL_QUERY),
             HumanMessage(content=state.user_query)
@@ -52,14 +60,19 @@ class Workflow:
         return {"retrieval_query": retrieval_query}
 
     def _query_pdf(self, query: str, k: int = 5) -> str:
+        """query the vector db"""
         results = self.vectorstore.query(query, k)
         return "\n".join(results["documents"][0])
 
     def _retrieve_context_step(self, state: RAGState) -> dict:
+        """retrieve the relevant context to allow the agent to answer the user question"""
         context = self._query_pdf(state.retrieval_query)
         return {"context": context}
 
     def _generate_summary_step(self, state: RAGState) -> dict:
+        """
+        Generate the summary/ answer to the user query using the context retrieved
+        """
         system_prompt, user_prompt = self.prompts.get_generation_prompts(query=state.retrieval_query, context=state.context)
 
         new_messages = [
