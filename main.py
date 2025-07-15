@@ -25,7 +25,22 @@ def show_upload_view():
         st.rerun()  # trigger rerun to switch views
 
     st.markdown(
-        "<small>🔗 View the code on <a href='https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent' target='_blank'>GitHub</a></small>",
+        """
+        <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        </style>
+        <div class="footer">
+            🔗 <a href="https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent" target="_blank">View this project on GitHub</a>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
@@ -83,7 +98,22 @@ def show_summarize_view():
         # Store full updated chat state
         st.session_state.chat_state = final_state
     st.markdown(
-        "<small>🔗 View the code on <a href='https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent' target='_blank'>GitHub</a></small>",
+        """
+        <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        </style>
+        <div class="footer">
+            🔗 <a href="https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent" target="_blank">View this project on GitHub</a>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
