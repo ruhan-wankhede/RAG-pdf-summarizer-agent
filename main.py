@@ -24,6 +24,11 @@ def show_upload_view():
         st.session_state.app_stage = "summarize" #move to next view
         st.rerun()  # trigger rerun to switch views
 
+    st.markdown(
+        "<small>🔗 View the code on <a href='https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent' target='_blank'>GitHub</a></small>",
+        unsafe_allow_html=True
+    )
+
 #actual chat page of the ui
 def show_summarize_view():
     st.title("📝 Ask about your document")
@@ -77,6 +82,10 @@ def show_summarize_view():
 
         # Store full updated chat state
         st.session_state.chat_state = final_state
+    st.markdown(
+        "<small>🔗 View the code on <a href='https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent' target='_blank'>GitHub</a></small>",
+        unsafe_allow_html=True
+    )
 
 
 if __name__ == "__main__":
