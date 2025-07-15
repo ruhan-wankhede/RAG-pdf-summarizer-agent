@@ -65,6 +65,12 @@ def show_summarize_view():
             st.session_state.chat_state = RAGState()
             st.rerun()
 
+        st.markdown("---")
+        st.markdown(
+            """🔗<a href="https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent" style="text-decoration:none">GitHub Repo</a>""",
+            unsafe_allow_html=True
+        )
+
     query = st.chat_input("Ask something about your document...")
 
     # Initialize chat state if it doesn't exist
@@ -96,24 +102,7 @@ def show_summarize_view():
 
         # Store full updated chat state
         st.session_state.chat_state = final_state
-    st.markdown(
-        """
-        <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 0.9rem;
-            padding: 10px;
-        }
-        </style>
-        <div class="footer">
-            🔗 <a href="https://github.com/ruhan-wankhede/RAG-pdf-summarizer-agent" target="_blank">View this project on GitHub</a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+
 
 
 if __name__ == "__main__":
