@@ -8,3 +8,4 @@ python-dotenv>=1.0.1
 pydantic>=2.5.3
 langchain-core>=0.1.45
 langchain-text-splitters~=0.3.8
+chromadb[duckdb]>=0.4.24
