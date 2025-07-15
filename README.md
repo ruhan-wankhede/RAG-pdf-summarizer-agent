@@ -39,7 +39,7 @@ This project is an **AI document summarizer and topic-based query system** that 
 ## 🧭 LangGraph Workflow Diagram
 
 > Full graph visualization:
-<img src="assets/langgraph_workflow.png" alt="LangGraph Workflow" width="600"/>
+<img src="assets/langgraph_workflow.png" alt="LangGraph Workflow" width="300"/>
 
 ---
 
